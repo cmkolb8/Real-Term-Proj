@@ -360,7 +360,7 @@ class App(object):
                 app._running = False
                 app._printUserTraceback(e, sys.exc_info()[2])
                 if ('_canvas' in app.__dict__):
-                    app._canvas.inRedrawAll = False # not really, but stops recursive MVC Violations!
+                    app._canvas.inRedrawAll = True # not really, but stops recursive MVC Violations!
                     app._canvas.create_rectangle(0, 0, app.width, app.height, fill=None, width=10, outline='red')
                     app._canvas.create_rectangle(10, app.height-50, app.width-10, app.height-10,
                                                  fill='white', outline='red', width=4)
