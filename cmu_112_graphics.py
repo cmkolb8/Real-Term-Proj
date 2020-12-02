@@ -145,6 +145,8 @@ from tkinter import messagebox, simpledialog, filedialog
 import inspect, copy, traceback
 import sys, os
 from io import BytesIO
+#adjusted the recurison limit
+sys.setrecursionlimit(1000000000)
 
 def failedImport(importName, installName=None):
     installName = installName or importName

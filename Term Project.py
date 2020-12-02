@@ -1,12 +1,12 @@
 #Caitlin Kolb 
-#
+#code taken from cmu graphics
 from cmu_112_graphics import * 
 from tkinter import * 
 import raycasting as ry
 import math 
 import random
-import decimal
 import move
+import stars
 
 #start screen mode 
 class StartScreenMode(Mode): 
@@ -51,10 +51,7 @@ class StartScreenMode(Mode):
     def redrawAll(mode, canvas):
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'black')
         #draws the stars
-        for i in range(25):
-            x = random.randint(0, mode.width)
-            y = random.randint(0,mode.height)
-            canvas.create_oval(x - 1, y - 2, x + 1, y + 1, fill = 'white')
+        stars.stars(mode, canvas)
         canvas.create_rectangle(mode.width/2 - 75, (3/4) * mode.height, 
             mode.width/2 + 75, (3/4) * mode.height + 50, fill = mode.instructionsColor, outline = mode.instructionsOutline)
         canvas.create_text(mode.width/2, (3/4) * mode.height + 25, text = 'Start Game', fill = 'white', font='Times 26 bold')
@@ -66,8 +63,6 @@ class StartScreenMode(Mode):
 #instructions page 
 class InstructionsMode(Mode):
     def appStarted(mode):
-        instructionsBackground = 'https://c4.wallpaperflare.com/wallpaper/66/989/201/fantasy-art-fantasy-city-battlegrounds-of-eldhelm-video-games-wallpaper-preview.jpg'
-        mode.instructionsBackground = mode.loadImage(instructionsBackground)
         mode.backgroundColor = 'red3'
         mode.outlineColor = 'red3'
 
@@ -85,10 +80,7 @@ class InstructionsMode(Mode):
 
     def redrawAll(mode, canvas):
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'black')
-        for i in range(25):
-            x = random.randint(0, mode.width)
-            y = random.randint(0, mode.height)
-            canvas.create_oval(x - 1, y - 2, x + 1, y + 1, fill = 'white')
+        stars.stars(mode, canvas)
         canvas.create_rectangle(50, mode.height - 50, 150, mode.height - 80, fill = mode.backgroundColor, outline = mode.outlineColor)
         canvas.create_text(100, mode.height - 65, text = 'return', fill = 'white', font = 'Times 26 bold')
 
@@ -100,10 +92,6 @@ class StoryMode(Mode):
         mode.intro = False 
         mode.secondAl = True
         mode.thirdAl = False
-        planet = 'hiclipart.com.png'
-        mode.planet = mode.loadImage(planet)
-        mode.size = 1/4
-        mode.sizey = mode.scaleImage(mode.planet, mode.size)
         mode.color = 'red3'
         mode.outline = 'red3'
 
@@ -137,10 +125,7 @@ class StoryMode(Mode):
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'black')
         canvas.create_rectangle(mode.width - 150, mode.height - 50, mode.width - 75, mode.height - 25, fill = mode.color, outline = mode.outline)
         canvas.create_text(mode.width - 112, mode.height - 37, text = 'Skip', fill = 'white', font = 'Times 20 bold')
-        for i in range(25):
-            x = random.randint(0, mode.width)
-            y = random.randint(0,mode.height)
-            canvas.create_oval(x - 1, y - 2, x + 1, y + 1, fill = 'white')
+        stars.stars(mode, canvas)
         if(mode.player == 0):
             if(0 < mode.time < 40):
                canvas.create_text(mode.width/2, mode.height/2, text = 'Your kind has inhabited the planet of Zorga for over 17 trillion years. You have had a peaceful existance.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50)
@@ -196,8 +181,8 @@ class SetMode(Mode):
         mode.yPos = 12
         mode.xDir = -1
         mode.yDir = 0
-        mode.xPlane = 0 
-        mode.yPlane = .66 
+        mode.xCameraPlane = 0 
+        mode.yCameraPlane = .66 
         mode.speed = .2
         mode.rotate = .05
         mode.finish = False
@@ -205,8 +190,14 @@ class SetMode(Mode):
         mode.y = 0
         mode.color = 'black'
         mode.begin = False
+        mode.imWidth = 64 
+        mode.imHeight = 64
+        mode.emptyBuffer = [float('inf')] * mode.height * mode.width 
+        mode.buffer = mode.emptyBuffer[:]
+        mode.texters = {}
+        mode.midX = mode.width / 2
+        mode.midY = mode.height / 2
 
-#algorithm learned from https://lodev.org/cgtutor/raycasting3.html 
     def mousePressed(mode, event):
         if(event.y > mode.height/2):
             midy = event.y // 2
@@ -217,8 +208,8 @@ class SetMode(Mode):
             x = (event.x // 16.67)
             xDist = int((x + mode.yPos) / 2)
             yDist = int((y + mode.xPos) / 2)
-            mapOfX = int(xDist // mode.xPos + mode.xDir + mode.xPlane)
-            mapOfY = int(yDist // mode.xPos + mode.xDir + mode.xPlane)
+            mapOfX = int(xDist // mode.xPos + mode.xDir + mode.xCameraPlane)
+            mapOfY = int(yDist // mode.xPos + mode.xDir + mode.yCameraPlane)
             if(event.x >= mode.width/2):
                 x = mode.yPos + (event.x // (24 - mode.yPos))
             else: 
@@ -230,15 +221,14 @@ class SetMode(Mode):
 
     def keyPressed(mode, event):
         if(event.key == "Left"):
-            if(mode.xDir > 0):
-                #this function math for rotating right (uses a rotation matrix)
-                move.right(mode)
-            else: 
+            if(mode.begin == False):
                 #this function math for rotating left (uses a rotation matrix)
                 move.left(mode)
+            else: 
+                move.right(mode)
 
         if(event.key == "Right"):
-            if(mode.xDir < 0):
+            if(mode.begin == False):
                 move.right(mode)
             else: 
                 move.left(mode)
@@ -259,6 +249,8 @@ class SetMode(Mode):
              mode.yDir = 0
              mode.xPos = 2
              mode.yPos = 12
+             mode.xCameraPlane = 0 
+             mode.yCameraPlane = .66 
              for i in range(1, 22):
                  mode.map[24][i] = 0
              for row in range(23):
@@ -271,14 +263,11 @@ class SetMode(Mode):
                 mode.map[row][0] = 3
                 mode.map[row][0] = 3
                 mode.map[row][23] = 3
-             print(mode.map)
-        if(event.key == 'e'):
-            mode.begin = False 
-            mode.xPos = 22
 
     def redrawAll(mode, canvas):
         #this function has the math behind the raycasting in order to give a 3D apperance
-        ry.drawRayCaster(mode, canvas)
+        while(not mode.finish):
+            ry.drawRayCaster(mode, canvas)
 
 class MyModalApp(ModalApp):
     def appStarted(mode):

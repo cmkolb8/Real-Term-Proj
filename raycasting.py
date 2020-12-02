@@ -1,13 +1,14 @@
 import math 
+import random
+#algorithm learned from https://lodev.org/cgtutor/raycasting3.html 
 def drawRayCaster(mode, canvas):
-       while(not mode.finish):
             for x in range(mode.width):
                 xMap = int(mode.xPos)
                 yMap = int(mode.yPos)
                 hit = 0 
                 xCamera = 2.0 * x / mode.width - 1.0
-                xRayDir = mode.xDir + xCamera * mode.xPlane 
-                yRayDir = mode.yDir + xCamera * mode.yPlane + .0000001 #so don't divde by zero
+                xRayDir = mode.xDir + xCamera * mode.xCameraPlane 
+                yRayDir = mode.yDir + xCamera * mode.yCameraPlane + .0000001 #so don't divde by zero
                 #calculate distance to next x and y edge (sqaure border)
                 xDeltaDist = math.sqrt(1.0 + (yRayDir * yRayDir) / ((xRayDir * xRayDir)))
                 yDeltaDist = math.sqrt(1.0 + (xRayDir * xRayDir) / ((yRayDir * yRayDir)))
@@ -68,4 +69,16 @@ def drawRayCaster(mode, canvas):
                             color[i] = int(j / 2 )
                     col = '#%02x%02x%02x' % (color[0], color[1], color[2])
                     canvas.create_line(x, start, x, end, fill = col)
+
+#code adapted from https://www.mediafire.com/file/4155l5gz6fuxpbm/3D_Graphics_in_Tkinter_v1.00.py/file 
+            if(mode.begin == True):
+                topLeft = (mode.midX+50,mode.midY+50)
+                topRight = (mode.midX+100,mode.midY+50)
+                bottomLeft = (mode.midX+200,mode.midY+600)
+                bottomRight = (mode.midX+1000,mode.midY+500)
+                canvas.create_polygon(topLeft, bottomLeft, bottomRight, topRight, fill = 'gray25', outline = 'red4', width = 5)
+                topRight, bottomRight = topLeft, bottomLeft
+                topLeft = (topRight[0],mode.midY+100)
+                bottomLeft = (mode.midX+200,mode.midY+1000)
+                canvas.create_polygon(topLeft, bottomLeft, bottomRight, topRight,fill = 'gray25', outline = 'red4', width = 5)
             canvas.update()
