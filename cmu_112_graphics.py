@@ -145,8 +145,6 @@ from tkinter import messagebox, simpledialog, filedialog
 import inspect, copy, traceback
 import sys, os
 from io import BytesIO
-#adjusted the recurison limit
-sys.setrecursionlimit(1000000000)
 
 def failedImport(importName, installName=None):
     installName = installName or importName
@@ -474,7 +472,7 @@ class App(object):
               app._methodIsOverridden('keyPressed') and
               (not event.key == 'Modifier_Key')):
             app.keyPressed(event)
-            app._redrawAllWrapper()
+            #app._redrawAllWrapper()
 
     @_safeMethod
     def _keyReleasedWrapper(app, event):
@@ -482,7 +480,7 @@ class App(object):
         event = App.KeyEventWrapper(event)
         if (not event.key == 'Modifier_Key'):
             app.keyReleased(event)
-            app._redrawAllWrapper()
+            #app._redrawAllWrapper()
 
     @_safeMethod
     def _mousePressedWrapper(app, event):
@@ -496,7 +494,7 @@ class App(object):
             app._lastMousePosn = (event.x, event.y)
             if (app._methodIsOverridden('mousePressed')):
                 app.mousePressed(event)
-                app._redrawAllWrapper()
+                #app._redrawAllWrapper()
 
     @_safeMethod
     def _mouseReleasedWrapper(app, event):

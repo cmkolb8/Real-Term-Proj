@@ -1,5 +1,5 @@
 #Caitlin Kolb 
-#code taken from cmu graphics
+#using cmu graphics
 from cmu_112_graphics import * 
 from tkinter import * 
 import raycasting as ry
@@ -7,6 +7,7 @@ import math
 import random
 import move
 import stars
+import projectile 
 
 #start screen mode 
 class StartScreenMode(Mode): 
@@ -103,7 +104,7 @@ class StoryMode(Mode):
         elif(60 < mode.time < 100):
             mode.secondAl = False 
             mode.thirAl = True
-        if(mode.time == 160):
+        if(mode.time == 140):
             mode.app.setActiveMode(mode.app.setMode)
 
     def mousePressed(mode, event):  
@@ -144,8 +145,6 @@ class StoryMode(Mode):
                 canvas.create_text(mode.width/2, mode.height/2, text = 'You must fight the inhabitants to gain this new territory. But beware, losing could have dire consequences.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50) 
             elif(110 < mode.time < 140):
                 canvas.create_text(mode.width/2, mode.height/2, text = 'Good luck comrade. Bring us home some new land.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50) 
-        if(140 < mode.time):
-            canvas.create_image(mode.width/2, mode.height/2, image = ImageTk.PhotoImage(mode.sizey))
 
 class SetMode(Mode):
     def appStarted(mode):
@@ -192,11 +191,17 @@ class SetMode(Mode):
         mode.begin = False
         mode.imWidth = 64 
         mode.imHeight = 64
-        mode.emptyBuffer = [float('inf')] * mode.height * mode.width 
-        mode.buffer = mode.emptyBuffer[:]
-        mode.texters = {}
         mode.midX = mode.width / 2
         mode.midY = mode.height / 2
+        mode.timer = 0
+        mode.count = 1
+        mode.power = 1
+        mode.fire = False
+        mode.keepTrack = 0
+        mode.texture = mode.loadImage('greystone.png')
+        mode.soldierInput = mode.loadImage('soldier.png')
+        mode.soldier = mode.soldierInput.resize((64, 64))
+
 
     def mousePressed(mode, event):
         if(event.y > mode.height/2):
@@ -237,11 +242,17 @@ class SetMode(Mode):
             if(mode.begin == False):
             #checks if there is a block ahead, if not, walk forward
                 move.up(mode)
+            elif(mode.count < 23): 
+                mode.count += 1
 
         if(event.key == 'Down'):
             if(mode.begin == False):
             #checks if there is a block behind, if not, walk backward
                 move.down(mode)
+            elif(mode.count > 0): 
+                mode.count -= 1
+            else: 
+                pass
 
         if(event.key == 'd'):
              mode.begin = True
@@ -262,7 +273,14 @@ class SetMode(Mode):
              for row in range(46):
                 mode.map[row][0] = 3
                 mode.map[row][0] = 3
-                mode.map[row][23] = 3
+                mode.map[row][23] = 3 
+        
+        if(event.key == 'p'):
+            if(mode.begin):
+                mode.power += 10
+
+        if(event.key == 'f'):
+            mode.fire = True
 
     def redrawAll(mode, canvas):
         #this function has the math behind the raycasting in order to give a 3D apperance

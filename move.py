@@ -1,4 +1,5 @@
 import math 
+
 #algorithm learned from https://lodev.org/cgtutor/raycasting3.html 
 def left(mode):
     yDir = mode.yDir 

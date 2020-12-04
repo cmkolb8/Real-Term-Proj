@@ -1,4 +1,5 @@
 import random 
+
 def stars(mode, canvas):
      for i in range(25):
             x = random.randint(0, mode.width)
