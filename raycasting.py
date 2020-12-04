@@ -3,23 +3,20 @@ import random
 import shotGun
 from tkinter import * 
 import projectile 
+import blockOption
 
 #algorithm learned from https://lodev.org/cgtutor/raycasting3.html 
 def drawRayCaster(mode, canvas):
-
     for x in range(mode.width):
         xMap = int(mode.xPos)
         yMap = int(mode.yPos)
         hit = 0 
-        texNum = mode.map[xMap][yMap] - 1
         xCamera = 2.0 * x / mode.width - 1.0
         xRayDir = mode.xDir + xCamera * mode.xCameraPlane 
         yRayDir = mode.yDir + xCamera * mode.yCameraPlane + .0000001 #so don't divde by zero
         #calculate distance to next x and y edge (sqaure border)
         xDeltaDist = math.sqrt(1.0 + (yRayDir * yRayDir) / ((xRayDir * xRayDir)))
         yDeltaDist = math.sqrt(1.0 + (xRayDir * xRayDir) / ((yRayDir * yRayDir)))
-        xWall = 0.0
-        step = 0
         
         #calculate the steps (which direction to go in) and the initall distance 
         #x and y distance of the ray 
@@ -44,15 +41,15 @@ def drawRayCaster(mode, canvas):
                 side = True 
                 ySideDist += yDeltaDist
                 yMap += yStep
-                
+
             else: 
                 side = False
                 xSideDist += xDeltaDist
                 xMap += xStep
-                    
-            #check if ray has hit the wall
+
+                #check if ray has hit the wall
             if(mode.map[xMap][yMap] > 0):
-                hit = 1
+                    hit = 1
 
             #(xMap - mode.xPos + (1 - xStep / 2) = number of sqaures the ray has crossed in x dir 
             #calculates distance projected on camera direction (simply using the perpindicualar to the camera plane)
@@ -71,30 +68,31 @@ def drawRayCaster(mode, canvas):
             if(end >= mode.height):
                 end = mode.height - 1
             
-            if(side == 0):
-                xWall = mode.yPos + perpWallDist * yRayDir 
-            else:
-                xWall = mode.xPos + perpWallDist * xRayDir 
-        
-            
             #colors 
-            posColors = [[0,0,0], [0,100, 100], [150, 0 ,0], [0,150,0], [0,0,150], [100,30, 100]]
+            posColors = [[0,0,0], [0, 100, 0], [150, 0 ,0], [0,100, 100], [0,150,0], [100,30, 100], [150, 0 ,0], [0,0,150]]
             color = posColors[mode.map[xMap][yMap]]
             if(side == True):
                 for i, j in enumerate(color):
-                    color[i] = int(j / 2 )
+                        color[i] = int(j / 2 )
             col = '#%02x%02x%02x' % (color[0], color[1], color[2])
-            canvas.create_line(x, start, x, end, fill = col)
-        
-            if(mode.fire == True):
-                
-                if(mode.keepTrack % 10000 == 0):
-                      mode.timer += 1
+            if(mode.map[xMap][yMap] == 5):
+                canvas.create_line(x, start - 10, x, end, fill = col)
+            else:
+                canvas.create_line(x, start, x, end, fill = col)
+
+    if(mode.begin == False):
+        blockOption.drawBlock(mode, canvas)
                       
     if(mode.begin == True):
         shotGun.bottomTank(mode, canvas)
         shotGun.shotGun(mode, canvas)
         shotGun.powerBar(mode, canvas)
+        canvas.create_text(400, 50, text = mode.myScore, fill = 'white', font='Times 26 bold')
     if(mode.fire):
-        projectile.projectile(mode, mode.count, mode.power, canvas)
+        while(mode.timer < 15):
+            projectile.projectile(mode, mode.count, mode.power, canvas)
+            mode.timer += 1
+        mode.timer = 0
+        mode.fire = False 
+
     canvas.update()

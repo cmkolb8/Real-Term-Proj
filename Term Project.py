@@ -149,33 +149,14 @@ class StoryMode(Mode):
 class SetMode(Mode):
     def appStarted(mode):
         #beginning map, competely empty except for sides
-        mode.map = [
-  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
-        ]
+        mode.map = [([0] * 24) for row in range(48)]
+        for i in range(len(mode.map)):
+            for j in range(len(mode.map[0])):
+                mode.map[0][j] = 3
+                mode.map[47][j] = 3
+                mode.map[i][0] = 3
+                mode.map[i][23] = 3
+                mode.map[24][j] = 3
         mode.xPos = 22
         mode.yPos = 12
         mode.xDir = -1
@@ -183,11 +164,8 @@ class SetMode(Mode):
         mode.xCameraPlane = 0 
         mode.yCameraPlane = .66 
         mode.speed = .2
-        mode.rotate = .05
+        mode.rotate = .02
         mode.finish = False
-        mode.x = 0
-        mode.y = 0
-        mode.color = 'black'
         mode.begin = False
         mode.imWidth = 64 
         mode.imHeight = 64
@@ -198,8 +176,21 @@ class SetMode(Mode):
         mode.power = 1
         mode.fire = False
         mode.keepTrack = 0
+        mode.big = False
+        mode.small = True
+        mode.turn = 0
+        mode.myScore = 10
+        mode.enemyScore = 10
+        mode.timerDelay = 100
 
     def mousePressed(mode, event):
+        if(25 < event.x < 75 and mode.height - 50 > event.y > mode.height - 100):
+            mode.big = True
+            mode.small = False
+            
+        if(75 < event.x < 125 and mode.height - 50 > event.y > mode.height - 100):
+            mode.big = False
+            mode.small = True
         if(event.y > mode.height/2):
             midy = event.y // 2
             yDist = int((event.y + mode.xPos) / 2)
@@ -218,7 +209,11 @@ class SetMode(Mode):
             y = mode.xPos + ((event.y // (24 - mode.xPos)))
             if(dist >= mode.xPos):
                 dist = mode.xPos - 3
-            mode.map[dist][xDist] = 5
+            if(mode.big):
+                mode.map[dist][xDist] = 5
+            else: 
+                mode.map[dist][xDist] = 1
+
 
     def keyPressed(mode, event):
         if(event.key == "Left"):
@@ -227,12 +222,14 @@ class SetMode(Mode):
                 move.left(mode)
             else: 
                 move.right(mode)
+                mode.turn -= 1
 
         if(event.key == "Right"):
             if(mode.begin == False):
                 move.right(mode)
             else: 
                 move.left(mode)
+                mode.turn += 1
             
         if(event.key == 'Up'):
             if(mode.begin == False):
@@ -259,24 +256,24 @@ class SetMode(Mode):
              mode.xCameraPlane = 0 
              mode.yCameraPlane = .66 
              for i in range(1, 22):
-                 mode.map[24][i] = 0
-             for row in range(23):
-                 firstList = list()
-                 for col in range(24):
-                    num = random.randint(0, 1)
-                    firstList.append(num)
-                 mode.map.append(firstList)
-             for row in range(46):
-                mode.map[row][0] = 3
-                mode.map[row][0] = 3
-                mode.map[row][23] = 3 
-        
+                mode.map[24][i] = 0
+             for i in range(10):
+                enemyRow = random.randint(25, 45)
+                enemyCol = random.randint(3, 21)
+                mode.map[enemyRow][enemyCol] = 1
+                defense = random.randint(0, 5)
+                for i in range(defense):
+                    xRand = random.randint(-2, -1)
+                    yRand = random.randint(-2, 2)
+                    mode.map[enemyRow + xRand][enemyCol + yRand] = 6
+
         if(event.key == 'p'):
             if(mode.begin):
                 mode.power += 10
 
         if(event.key == 'f'):
             mode.fire = True
+            print(mode.fire)
 
     def redrawAll(mode, canvas):
         #this function has the math behind the raycasting in order to give a 3D apperance
