@@ -198,10 +198,6 @@ class SetMode(Mode):
         mode.power = 1
         mode.fire = False
         mode.keepTrack = 0
-        mode.texture = mode.loadImage('greystone.png')
-        mode.soldierInput = mode.loadImage('soldier.png')
-        mode.soldier = mode.soldierInput.resize((64, 64))
-
 
     def mousePressed(mode, event):
         if(event.y > mode.height/2):

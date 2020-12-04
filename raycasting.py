@@ -6,16 +6,20 @@ import projectile
 
 #algorithm learned from https://lodev.org/cgtutor/raycasting3.html 
 def drawRayCaster(mode, canvas):
+
     for x in range(mode.width):
         xMap = int(mode.xPos)
         yMap = int(mode.yPos)
         hit = 0 
+        texNum = mode.map[xMap][yMap] - 1
         xCamera = 2.0 * x / mode.width - 1.0
         xRayDir = mode.xDir + xCamera * mode.xCameraPlane 
         yRayDir = mode.yDir + xCamera * mode.yCameraPlane + .0000001 #so don't divde by zero
         #calculate distance to next x and y edge (sqaure border)
         xDeltaDist = math.sqrt(1.0 + (yRayDir * yRayDir) / ((xRayDir * xRayDir)))
         yDeltaDist = math.sqrt(1.0 + (xRayDir * xRayDir) / ((yRayDir * yRayDir)))
+        xWall = 0.0
+        step = 0
         
         #calculate the steps (which direction to go in) and the initall distance 
         #x and y distance of the ray 
@@ -67,6 +71,12 @@ def drawRayCaster(mode, canvas):
             if(end >= mode.height):
                 end = mode.height - 1
             
+            if(side == 0):
+                xWall = mode.yPos + perpWallDist * yRayDir 
+            else:
+                xWall = mode.xPos + perpWallDist * xRayDir 
+        
+            
             #colors 
             posColors = [[0,0,0], [0,100, 100], [150, 0 ,0], [0,150,0], [0,0,150], [100,30, 100]]
             color = posColors[mode.map[xMap][yMap]]
@@ -76,10 +86,10 @@ def drawRayCaster(mode, canvas):
             col = '#%02x%02x%02x' % (color[0], color[1], color[2])
             canvas.create_line(x, start, x, end, fill = col)
         
-           # if(mode.fire == True):
+            if(mode.fire == True):
                 
-               # if(mode.keepTrack % 10000 == 0):
-               #       mode.timer += 1
+                if(mode.keepTrack % 10000 == 0):
+                      mode.timer += 1
                       
     if(mode.begin == True):
         shotGun.bottomTank(mode, canvas)
