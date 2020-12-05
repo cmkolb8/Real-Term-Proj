@@ -494,7 +494,7 @@ class App(object):
             app._lastMousePosn = (event.x, event.y)
             if (app._methodIsOverridden('mousePressed')):
                 app.mousePressed(event)
-                app._redrawAllWrapper()
+                #app._redrawAllWrapper()
 
     @_safeMethod
     def _mouseReleasedWrapper(app, event):

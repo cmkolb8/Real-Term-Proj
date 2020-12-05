@@ -39,7 +39,7 @@ class StartScreenMode(Mode):
             mode.instructionsColor = 'red'
             mode.instructionsOutline = 'white'
         else: 
-            mode.instructionsColor = 'red3'
+            mode.instructionsColor = 'red3' 
             mode.instructionsOutline = 'red3'
         if(mode.width/2 - 75 <= event.x <= mode.width/2 + 75 
             and (2/3) * mode.height - 40 <= event.y <= (2/3) * mode.height + 10):
@@ -67,10 +67,12 @@ class InstructionsMode(Mode):
         mode.backgroundColor = 'red3'
         mode.outlineColor = 'red3'
 
+    #checks if pressed the button 
     def mousePressed(mode, event):
         if(50 <= event.x <= 150 and mode.height - 80 <= event.y <= mode.height - 50):
               mode.app.setActiveMode(mode.app.startScreenMode)
 
+    #highlights the button if hover over it 
     def mouseMoved(mode, event):  
         if(50 <= event.x <= 150 and mode.height - 80 <= event.y <= mode.height - 50):
             mode.backgroundColor = 'red'
@@ -79,11 +81,17 @@ class InstructionsMode(Mode):
             mode.backgroundColor = 'red3'
             mode.outlineColor = 'red3'
 
+    #draws the button and instructions
     def redrawAll(mode, canvas):
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'black')
         stars.stars(mode, canvas)
         canvas.create_rectangle(50, mode.height - 50, 150, mode.height - 80, fill = mode.backgroundColor, outline = mode.outlineColor)
         canvas.create_text(100, mode.height - 65, text = 'return', fill = 'white', font = 'Times 26 bold')
+        canvas.create_text(mode.width / 2, mode.height / 2, text ='Walk around your side setting up 10 targets (the green blocks).'
+                ' Then use the pink blocks to create a defense for your green blocks. Once your side is ready, click d and the match will begin.' 
+                ' Use the arrow keys to move around your tank and p to increase the power.'
+                ' When you think you are able to hit one of the enemys green blocks, hit f to fire.'
+                ' The first team to destroy all the other teams green blocks wins!', fill = 'firebrick3', font = 'Times 20 bold', width = mode.width - 50)
 
 #sets up the scene, picks which side you are on 
 class StoryMode(Mode):
@@ -96,6 +104,7 @@ class StoryMode(Mode):
         mode.color = 'red3'
         mode.outline = 'red3'
 
+    #sets each writing for a certain time 
     def timerFired(mode):
         mode.time += 1
         if(40 < mode.time < 60):
@@ -107,11 +116,13 @@ class StoryMode(Mode):
         if(mode.time == 140):
             mode.app.setActiveMode(mode.app.setMode)
 
+    #checks if hit the button 
     def mousePressed(mode, event):  
         if(mode.width - 150 <= event.x <= mode.width - 75 
             and mode.height - 50 <= event.y <= mode.height - 25):
             mode.app.setActiveMode(mode.app.setMode)
 
+    #chekc if button was hovered over 
     def mouseMoved(mode, event):  
         if(mode.width - 150 <= event.x <= mode.width - 75 
             and mode.height - 50 <= event.y <= mode.height - 25):
@@ -129,7 +140,8 @@ class StoryMode(Mode):
         stars.stars(mode, canvas)
         if(mode.player == 0):
             if(0 < mode.time < 40):
-               canvas.create_text(mode.width/2, mode.height/2, text = 'Your kind has inhabited the planet of Zorga for over 17 trillion years. You have had a peaceful existance.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50)
+               canvas.create_text(mode.width/2, mode.height/2, text = 'Your kind has inhabited the planet of Zorga for over 17 trillion years.'
+                ' You have had a peaceful existance.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50)
             elif(40 < mode.time < 60):
                 canvas.create_text(mode.width/2, mode.height/2, text = 'But everything has changed.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50) 
             elif(60 < mode.time < 110):
@@ -138,11 +150,13 @@ class StoryMode(Mode):
                 canvas.create_text(mode.width/2, mode.height/2, text = "I have faith in you. Do me proud. Protect Zorga.", fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50)
         else: 
             if(0 < mode.time < 40):
-               canvas.create_text(mode.width/2, mode.height/2, text = 'Upon your recent space mission you have discovered a new planet. An exciting discovery indeed. The only issue...', fill = 'firebrick3', font = "Times 26 bold", width = mode.width - 50)
+               canvas.create_text(mode.width/2, mode.height/2, text = 'Upon your recent space mission you have discovered a new planet.'
+                ' An exciting discovery indeed. The only issue...', fill = 'firebrick3', font = "Times 26 bold", width = mode.width - 50)
             elif(40 < mode.time < 60):
                 canvas.create_text(mode.width/2, mode.height/2, text = 'It is already inhabited.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50)    
             elif(60 < mode.time < 110):
-                canvas.create_text(mode.width/2, mode.height/2, text = 'You must fight the inhabitants to gain this new territory. But beware, losing could have dire consequences.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50) 
+                canvas.create_text(mode.width/2, mode.height/2, text = 'You must fight the inhabitants to gain this new territory. But beware,'
+                 ' losing could have dire consequences.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50) 
             elif(110 < mode.time < 140):
                 canvas.create_text(mode.width/2, mode.height/2, text = 'Good luck comrade. Bring us home some new land.', fill = 'firebrick3', font = 'Times 32 bold', width = mode.width - 50) 
 
@@ -157,6 +171,7 @@ class SetMode(Mode):
                 mode.map[i][0] = 3
                 mode.map[i][23] = 3
                 mode.map[24][j] = 3
+        #establishes variables for raycasting 
         mode.xPos = 22
         mode.yPos = 12
         mode.xDir = -1
@@ -165,29 +180,32 @@ class SetMode(Mode):
         mode.yCameraPlane = .66 
         mode.speed = .2
         mode.rotate = .02
+
+        #variables needed for when different buttons are pressed 
         mode.finish = False
         mode.begin = False
-        mode.imWidth = 64 
-        mode.imHeight = 64
+        mode.fire = False
+        mode.big = False
+        mode.small = True
+        
+        #varibles to used in projectile and enemy functions 
         mode.midX = mode.width / 2
         mode.midY = mode.height / 2
         mode.timer = 0
         mode.count = 1
         mode.power = 1
-        mode.fire = False
-        mode.keepTrack = 0
-        mode.big = False
-        mode.small = True
         mode.turn = 0
         mode.myScore = 10
         mode.enemyScore = 10
-        mode.timerDelay = 100
+        mode.timerDelay = 250
+        mode.sold = 0
 
     def mousePressed(mode, event):
         if(25 < event.x < 75 and mode.height - 50 > event.y > mode.height - 100):
             mode.big = True
             mode.small = False
             
+        #calucates where the block should be placed based on current position and eventx/y
         if(75 < event.x < 125 and mode.height - 50 > event.y > mode.height - 100):
             mode.big = False
             mode.small = True
@@ -209,11 +227,11 @@ class SetMode(Mode):
             y = mode.xPos + ((event.y // (24 - mode.xPos)))
             if(dist >= mode.xPos):
                 dist = mode.xPos - 3
-            if(mode.big):
+            if(mode.big and (xDist > 13 or xDist < 11)):
                 mode.map[dist][xDist] = 5
-            else: 
+            elif(mode.small and (xDist > 13 or xDist < 11) and mode.sold < 10): 
+                mode.sold += 1
                 mode.map[dist][xDist] = 1
-
 
     def keyPressed(mode, event):
         if(event.key == "Left"):
@@ -247,6 +265,7 @@ class SetMode(Mode):
             else: 
                 pass
 
+        #when d is pressed, player turns around and enemy's defense is drawn
         if(event.key == 'd'):
              mode.begin = True
              mode.xDir = 1
@@ -254,31 +273,46 @@ class SetMode(Mode):
              mode.xPos = 2
              mode.yPos = 12
              mode.xCameraPlane = 0 
-             mode.yCameraPlane = .66 
              for i in range(1, 22):
                 mode.map[24][i] = 0
+             #puts enemy soldiers
              for i in range(10):
                 enemyRow = random.randint(25, 45)
                 enemyCol = random.randint(3, 21)
                 mode.map[enemyRow][enemyCol] = 1
-                defense = random.randint(0, 5)
+                #puts enemy blocks around soldiers 
+                defense = random.randint(1, 5)
                 for i in range(defense):
                     xRand = random.randint(-2, -1)
-                    yRand = random.randint(-2, 2)
-                    mode.map[enemyRow + xRand][enemyCol + yRand] = 6
+                    yRand = random.randint(-1, 1)
+                    mode.map[enemyRow + -1][enemyCol + yRand] = 6
 
+        #increases power of shot
         if(event.key == 'p'):
             if(mode.begin):
                 mode.power += 10
 
-        if(event.key == 'f'):
+        #fires 
+        if(event.key == 'f' and mode.begin):
             mode.fire = True
-            print(mode.fire)
 
     def redrawAll(mode, canvas):
         #this function has the math behind the raycasting in order to give a 3D apperance
         while(not mode.finish):
             ry.drawRayCaster(mode, canvas)
+            ry.possible(mode, canvas)
+
+class GameOverWinMode(Mode):
+    def redrawAll(mode, canvas):
+        canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'black')
+        stars.stars(mode, canvas)
+        canvas.create_text(mode.width / 2, mode.height / 2, text = 'Congratulations comrad, you have won the planet!', fill = 'white')
+
+class GameOverLoseMode(Mode):
+    def redrawAll(mode, canvas):
+        canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'black')
+        stars.stars(mode, canvas)
+        canvas.create_text(mode.width / 2, mode.height / 2, text = 'I am sorry, but you have lost the game and given up the hold of Zorga :(', fill = 'white')
 
 class MyModalApp(ModalApp):
     def appStarted(mode):
@@ -287,6 +321,8 @@ class MyModalApp(ModalApp):
         mode.instructionsMode = InstructionsMode()
         mode.storyMode = StoryMode()
         mode.setActiveMode(mode.startScreenMode) 
+        mode.setGameOverWinMode = GameOverWinMode()
+        mode.setGameOverLoseMode = GameOverLoseMode()
 
 app = MyModalApp(width = 500, height = 400)
 

@@ -4,6 +4,7 @@ import shotGun
 from tkinter import * 
 import projectile 
 import blockOption
+import enemy
 
 #algorithm learned from https://lodev.org/cgtutor/raycasting3.html 
 def drawRayCaster(mode, canvas):
@@ -71,27 +72,50 @@ def drawRayCaster(mode, canvas):
             #colors 
             posColors = [[0,0,0], [0, 100, 0], [150, 0 ,0], [0,100, 100], [0,150,0], [100,30, 100], [150, 0 ,0], [0,0,150]]
             color = posColors[mode.map[xMap][yMap]]
+            #picks the right color of each spot on the map 
             if(side == True):
                 for i, j in enumerate(color):
-                        color[i] = int(j / 2 )
+                        color[i] = int(j / 2)
             col = '#%02x%02x%02x' % (color[0], color[1], color[2])
             if(mode.map[xMap][yMap] == 5):
                 canvas.create_line(x, start - 10, x, end, fill = col)
             else:
                 canvas.create_line(x, start, x, end, fill = col)
 
+#is called when mouse is pressed to shoot 
+def possible(mode, canvas):
+    #draws the enemy's blocks
     if(mode.begin == False):
         blockOption.drawBlock(mode, canvas)
-                      
+
+    #calls the draw function for the tank 
     if(mode.begin == True):
         shotGun.bottomTank(mode, canvas)
         shotGun.shotGun(mode, canvas)
         shotGun.powerBar(mode, canvas)
         canvas.create_text(400, 50, text = mode.myScore, fill = 'white', font='Times 26 bold')
+
+    #called when user presses f 
     if(mode.fire):
+        three = False 
+        while(not three):
+            ang = random.randint(3, 70)
+            if(ang % 3 == 0):
+                three = True
+        count = random.randint(2, 24)
+        direc = False 
+        while(not direc):
+            xy = random.randint(-1, 1)
+            if(xy != 0):
+                direc = True
         while(mode.timer < 15):
+            #class projectile draw 
             projectile.projectile(mode, mode.count, mode.power, canvas)
+            enemy.outProjectile(mode, ang, count, xy, canvas)
             mode.timer += 1
+        #shoots ball
+        enemy.shoot(mode, xy, count)
+        projectile.checkBlock(mode, mode.count)
         mode.timer = 0
         mode.fire = False 
 
