@@ -16,6 +16,7 @@ def outProjectile(mode, ang, count, xy, canvas):
     newTime = 0
     while(time > 0):
         #physics of x and y pos on way up 
+        row = shoot(mode, xy, count)
         yPos = mode.midY - 15 - 10 * (count) - Vy * (time * 75) - yAccel * (time * 75) ** 2 / 2
         xPos =  mode.midX + 60 + xy * (count) + xy * (Vx * time * 15)
         if(yPos + loop < mode.height / 2 - 10):

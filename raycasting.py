@@ -1,3 +1,4 @@
+from cmu_112_graphics import * 
 import math 
 import random
 import shotGun
@@ -7,6 +8,7 @@ import blockOption
 import enemy
 import topView
 import stars
+from pygame import mixer
 
 #algorithm learned from https://lodev.org/cgtutor/raycasting3.html 
 def drawRayCaster(mode, canvas):
@@ -126,10 +128,12 @@ def possible(mode, canvas):
                 direc = True
         while(mode.timer < 15):
             #this function draws the player's projectile 
-            projectile.projectile(mode, mode.count, mode.power, canvas)
+            x = projectile.projectile(mode, mode.count, mode.power, canvas)
             #this function draws the enemey's projectile 
             enemy.outProjectile(mode, ang, count, xy, canvas)
             mode.timer += 1
+            mixer.init()
+            mixer.Sound.play(mode.cannon)
         if(not mode.hard):
             #this function checks where the enemy's projectile hit 
             enemy.shoot(mode, xy, count)
@@ -150,6 +154,12 @@ def possible(mode, canvas):
         else: 
             projectile.checkBlock(mode, mode.count)
         mode.timer = 0
+        if(mode.hit):
+            mixer.Sound.stop(mode.cannon)
+            mixer.Sound.play(mode.explosion)
+            tup = projectile.checkBlock(mode, mode.count)
+            canvas.create_image(x, mode.height/ 2 - 20, image = ImageTk.PhotoImage(mode.fireImage))
+        mode.hit = False
         mode.fire = False 
 
     canvas.update()

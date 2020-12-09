@@ -1,5 +1,6 @@
 import math
 import enemy
+from pygame import mixer
 
 def projectile(mode, count, power, canvas): 
     #setting up variables needed to calucate x and y pos 
@@ -35,16 +36,25 @@ def projectile(mode, count, power, canvas):
         time -= .01
         if(loop > 5): 
             loop -= .15
+        return(xPos)
 
 def checkBlock(mode, count):
     #calculates which block is hit based on the count and turn 
-    row = count + 24 
+    row = count
     col = mode.turn
-    if(0 > col  or col > 23):
+    for i in range(-10, 10):
+        r = row + i
+        for j in range(-10, 10):
+            c = col + j
+            if(24 > r >= 0 and 24 > c >= 0):    
+                if(mode.map[r][c] == 1):
+                    mode.hit = True
+                    mode.map[r][c] = 0
+                    mode.myScore -= 1
+    row = count  
+    col = mode.turn
+    if(0 > col  or col > 23 or 0 > row  or row > 23):
         pass
-    elif(mode.map[row][col] == 1):
-        mode.map[row][col] = 0
-        mode.myScore -= 1
     elif(mode.map[row][col] == 6):
         mode.map[row][col] = 0
     if(mode.myScore == 0):
@@ -54,14 +64,14 @@ def checkBlock(mode, count):
 def calculateXY(mode, xy, count):
         spot = checkBlock(mode, count)
         current = 0
-        smallest = enemy.dist(spot[0], spot[1], mode.mySold[0][0], mode.mySold[0][1])
-        xDist = abs(spot[0] - mode.mySold[0][0])
-        yDist = abs(spot[1] + mode.mySold[0][1])
-        for i in range(len(mode.mySold)): 
-            temp = enemy.dist(spot[0], spot[1], mode.mySold[i][0], mode.mySold[i][1])
+        smallest = enemy.dist(spot[0], spot[1], mode.enemySold[0][0], mode.enemySold[0][1])
+        xDist = abs(spot[0] - mode.enemySold[0][0])
+        yDist = abs(spot[1] - mode.enemySold[0][1])
+        for i in range(len(mode.enemySold)): 
+            temp = enemy.dist(spot[0], spot[1], mode.enemySold[i][0], mode.enemySold[i][1])
             if(temp < smallest):
                 smallest = temp
                 current = i 
-                xDist = abs(spot[0] - mode.mySold[i][0])
-                yDist = abs(spot[1] + mode.mySold[i][1])
+                xDist = abs(spot[0] - mode.enemySold[i][0])
+                yDist = abs(spot[1] + mode.enemySold[i][1])
         return (xDist, yDist)

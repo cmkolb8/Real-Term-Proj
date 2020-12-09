@@ -10,16 +10,21 @@ import stars
 import projectile 
 import topView
 import story 
+from pygame import mixer
 
 #start screen mode 
 class StartScreenMode(Mode): 
     def appStarted(mode):
+        #image created on cool text https://cooltext.com/ 
         title = 'https://images.cooltext.com/5480353.png'
         mode.title = mode.loadImage(title)
         mode.instructionsColor = 'red3'
         mode.gameColor = 'red3'
         mode.instructionsOutline = 'red3'
         mode.gameOutline = 'red3'
+        mixer.init()
+        startSound = mixer.music.load('lens.ogg')
+        mixer.music.play(-1)
     
     #checks if buttons were pressed 
     def mousePressed(mode, event):  
@@ -149,6 +154,7 @@ class SetPickMode(Mode):
         mode.instructionsOutline = 'red3'
         mode.gameOutline = 'red3'
 
+
     #creates highlight for when hovering over button 
     def mouseMoved(mode, event):  
         if(mode.width/2 - 75 <= event.x <= mode.width/2 + 75 
@@ -226,13 +232,26 @@ class SetEasyMode(Mode):
         mode.power = 1
         mode.turn = 12
         mode.myScore = 10
-        mode.mySold = list()
+        mode.enemySold = list()
         mode.enemyScore = 0
         mode.timerDelay = 250
         mode.sold = 0
         mode.top = False
-        mode.fireImg = mode.loadImage('fire.jpg')
+        #image taken from google images
+        mode.firIm = mode.loadImage('fire.png')
+        mode.fireImage = mode.scaleImage(mode.firIm, 1/8)
         mode.hard = False
+
+        #loaded in and variables needed for music/ sounds
+        #audio taken from youtube https://studio.youtube.com/channel/UCQa5ozxpCX1XkAFHTf9YpOQ/music
+        startSound = mixer.music.load('war.ogg')
+        mixer.music.play(-1)
+        mode.cannon = mixer.Sound('cannon.ogg')
+        mode.explosion = mixer.Sound('explosion.ogg')
+        mode.blockPlace = mixer.Sound('block.ogg')
+        mode.blockVol = mode.blockPlace.set_volume(8)
+        mode.hit = False
+        
 
     def mousePressed(mode, event):
         if(25 < event.x < 75 and mode.height - 50 > event.y > mode.height - 100):
@@ -250,11 +269,12 @@ class SetEasyMode(Mode):
             if(dist >= mode.xPos):
                 dist = mode.xPos - 3
             if(mode.big and (xDist > 13 or xDist < 11)):
+                mixer.Sound.play(mode.blockPlace)
                 mode.map[int(dist)][int(xDist)] = 5
             elif(mode.small and (xDist > 13 or xDist < 11) and mode.sold < 10): 
                 mode.enemyScore += 1
                 mode.sold += 1
-                mode.mySold.append((dist, xDist))
+                mixer.Sound.play(mode.blockPlace)
                 mode.map[dist][xDist] = 1
     
     def keyPressed(mode, event):
@@ -306,6 +326,7 @@ class SetEasyMode(Mode):
              for i in range(10):
                 enemyRow = random.randint(25, 45)
                 enemyCol = random.randint(3, 21)
+                mode.enemySold.append((enemyRow, enemyCol))
                 mode.map[enemyRow][enemyCol] = 1
                 #puts enemy blocks around soldiers 
                 defense = random.randint(1, 5)
@@ -361,7 +382,6 @@ class SetHardMode(SetEasyMode):
                 enemyRow = random.randint(25, 45)
                 enemyCol = random.randint(3, 21)
                 mode.map[enemyRow][enemyCol] = 1
-                print(1)
                 mode.soldiers.append((enemyRow, enemyCol))
                 #puts enemy blocks around soldiers 
                 defense = random.randint(1, 5)
